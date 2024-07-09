@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+<body>
+    <p>Profile</p>
+    <h1><%= username %></h1>
+    <form action="/update-password" method="post" onsubmit="return validate();">
+        <input type="hidden" name="username" value="<%= username %>">
+        <input type="password" name="password" placeholder="Enter current password" id="current_password">
+        <input type="password" name="new_password" placeholder="Enter new password" id="new_password">
+        <input type="password" placeholder="Re-enter new password" id="re_enter">
+        <button type="submit">Submit</button>
+    </form>
+    <% if (message) { %>
+        <p style = "color : red "><%= message %></p>
+    <% } %>
+    <script>
+        function validate() {
+            let current_password = document.getElementById("current_password").value;
+            let new_password = document.getElementById("new_password").value;
+            let re_enter = document.getElementById("re_enter").value;
+            
+            let error_msg = '';
+
+            if (!current_password)
+                error_msg += "Fill current password field.\n";
+            if (!new_password)
+                error_msg += "Fill new password field.\n";
+            if (!re_enter)
+                error_msg += "Fill confirm password field.\n";
+            
+            if (new_password && re_enter && new_password !== re_enter) {
+                alert("Re-entered password does not match.");
+                return false;
+            }
+            if (error_msg) {
+                alert(error_msg);
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>
