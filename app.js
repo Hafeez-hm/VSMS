@@ -4,7 +4,8 @@ const app = express ( )
 const path = require( 'path' ) 
 const bcrypt = require('bcrypt'); 
 const mongoose = require( 'mongoose' ) ; 
-const user = require( './models/user') ; 
+const user = require( './models/user') ;
+const services = require( './models/services' )
 const jwt = require( 'jsonwebtoken' ) ; 
 const cookieParser = require( 'cookie-parser') ; 
 const validator = require( 'validator' ) ;
@@ -58,6 +59,17 @@ app.get( '/profile' , authenticateToken , ( req , res ) => {
     res.render( "profile" , { username , message : "" } ) ; 
 })
 
+app.get( '/services' , authenticateToken , async ( req , res ) => {
+    try{ 
+        const service = await services.find( ) ; 
+        console.log( service ) ; 
+        res.render( 'services' , { service } ) ; 
+    }
+    catch( e ){
+        console.log( e ) ; 
+        res.status( 400 ).send( ) ; 
+    }
+})
 app.post( '/update-password' , async ( req , res ) => { 
     const { username , password , new_password } = req.body ; 
     
@@ -82,19 +94,25 @@ app.post( '/update-password' , async ( req , res ) => {
 
 app.post("/signup", async (req, res) => {
     try {
-        console.log(req.body);
+        console.log(req.body);  
         
-        const search_user = await user.findOne( { username : req.body.username } )
+        const { username, password } = req.body;
+
+        if (!validator.isEmail( username)) {
+            return res.render('signup', { message: "Invalid email format", username });
+        }
+
+        const search_user = await user.findOne( { username } )
 
         if( search_user ){
             console.log( search_user )
-            res.render( 'signup' , { message : "email aldredy exists" , username : req.body.username } )
+            res.render( 'signup' , { message : "email aldredy exists" , username } )
         }
         else{
-            const hashedPassword = await bcrypt.hash(req.body.password, 10); 
+            const hashedPassword = await bcrypt.hash( password, 10); 
 
             const new_user = new user({
-                username: req.body.username,
+                username: username,
                 password: hashedPassword
             });
 
@@ -117,18 +135,25 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
     console.log(req.body); 
 
-    const new_user =  await user.findOne( { username : req.body.username } ) 
+    const { username, password } = req.body;
+
+    //validate email format ;
+    if (!validator.isEmail( username )) {
+        return res.render('login', { message: "Invalid email format", username });
+    }
+
+    const new_user =  await user.findOne( { username } ) 
     console.log( new_user ) ;
 
     if( new_user == null ){
-        res.render ( "login" ,  { message : "user does not exist" , username : req.body.username } )
+        res.render ( "login" ,  { message : "user does not exist" , username } )
         res.status( 400 ).send( ) ; 
     }
 
     else{ 
-        if( await bcrypt.compare( req.body.password , new_user.password ) ){ 
+        if( await bcrypt.compare( password , new_user.password ) ){ 
             console.log( "successfully logged in" )
-            const obj = { username : req.body.username }
+            const obj = { username }
 
             const accessToken = jwt.sign( obj , process.env.ACCESS_TOKEN_SECRET )
             res.cookie( 'token' , accessToken , { httpOnly : true , sameSite : 'strict' , secure : true })
@@ -136,7 +161,7 @@ app.post("/login", async (req, res) => {
             res.redirect( '/home' ) 
         }
         else{ 
-            res.render ( "login" ,  { message : "invalid password" , username : req.body.username } )
+            res.render ( "login" ,  { message : "invalid password" , username } )
         }
     }
 });
