@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>welcome to your bookings</p>
+    <% for( let booking of bookings ){ %>
+        <div class="container">
+            <h1><%= booking.service_name %></h1>
+            <p><%=booking.time_slot %></p>
+            <button> delete booking </button>
+        </div>
+    <% } %>
+</body>
+</html>

@@ -6,15 +6,16 @@
     <title>Document</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="/css/services.css">
+    
 </head>
 <body>
    
     <div class="card-list">
-        <% service.forEach(e => { %>
-            <a href="#" class="card-item">
-                <img src="<%= e.image_url %>" alt="Card Image">
-                <span class="service-name"><%= e.service_name %></span>
-                <h3><%= e.description %></h3>
+        <% service.forEach(el => { %>
+            <a href="/reserve/<%=el.service_name%>" class="card-item">
+                <img src="<%= el.image_url %>" alt="Card Image">
+                <span class="service-name"><%= el.service_name %></span>
+                <h3><%= el.description %></h3>
                 <div class="arrow">
                     <i class="fas fa-arrow-right card-icon"></i>
                 </div>

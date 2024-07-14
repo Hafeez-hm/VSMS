@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/reserve" method="post" >
+        <input type="date" name = "date" id = "date" placeholder="set date ">
+        <input type="text" name = "service_name" value = "<%=service.service_name %>" hidden >
+
+        <% for (let time of service.time_slots) { %>
+            <input name="time_slot" class="check_box" type="checkbox" value="<%= time.start_time %> - <%= time.end_time %>">
+            <%= time.start_time %>-<%= time.end_time %>
+        <% } %>
+
+        <button> submit </button>
+    </form>
+    
+    <script>
+        // unchecking rest of the boxes when one is selected
+        document.addEventListener("DOMContentLoaded", () => {
+            const checkboxes = document.querySelectorAll('.check_box');
+    
+            checkboxes.forEach(checkbox => {
+
+                checkbox.addEventListener("change", () => {
+                    checkboxes.forEach(element => {
+                        if (element !== checkbox && element.checked) {
+                            element.checked = false;
+                        }
+                    });
+                });
+
+            });
+        });
+    </script>
+</body>
+</html>

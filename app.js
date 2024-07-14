@@ -62,7 +62,7 @@ app.get( '/profile' , authenticateToken , ( req , res ) => {
 app.get( '/services' , authenticateToken , async ( req , res ) => {
     try{ 
         const service = await services.find( ) ; 
-        console.log( service ) ; 
+        // console.log( service ) ; 
         res.render( 'services' , { service } ) ; 
     }
     catch( e ){
@@ -70,6 +70,48 @@ app.get( '/services' , authenticateToken , async ( req , res ) => {
         res.status( 400 ).send( ) ; 
     }
 })
+
+app.get( "/bookings" , authenticateToken , async ( req , res) => {
+    const { username } = req.user ; 
+    
+    const user_data = await user.findOne( { username } ) ; 
+    const bookings = user_data.bookings; 
+    res.render( "bookings" , { bookings } )
+})
+
+app.get( '/reserve/:name' , authenticateToken , async ( req , res ) => { 
+    try{ 
+        const{ name : service_name } = req.params ;
+        const service = await services.findOne( { service_name } ) ; 
+        console.log( service ) ; 
+        
+        res.render( "reserve" , { service } ) ;
+    }
+    catch( e ){
+        console.log( e ) ; 
+    }
+})
+
+app.post( '/reserve' , authenticateToken , async ( req , res ) => {
+    console.log( req.body )
+    const{ date , service_name , time_slot } = req.body ; 
+    
+    const { username } = req.user ; 
+    const user_data = await user.findOne( { username } ) ; 
+    if( !user_data ) 
+        res.status( 400 ).send( ) ; 
+
+    const booking = { 
+        service_name , time_slot
+    }
+
+    user_data.bookings.push( booking ) ; 
+
+    await user_data.save( ) ; 
+    
+    res.redirect( "/bookings" ) ; 
+})
+
 app.post( '/update-password' , async ( req , res ) => { 
     const { username , password , new_password } = req.body ; 
     
